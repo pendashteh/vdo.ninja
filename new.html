@@ -1,0 +1,475 @@
+--- START OF FILE index.html ---
+
+<html lang='en'>
+	<head>
+		<script type="text/javascript">
+			//  MS Internet Explorer must not be given a chance to fail before I can give the user an error message.
+			try {
+				var msie = window.navigator.userAgent.indexOf("MSIE ");
+				if (msie>0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)){ // If MSIE or IE 11
+					alert("Internet Explorer is not supported.\n\nPlease consider using Microsoft Edge or Google Chrome instead\n\nYou will be forwarded to the download page for MS Edge now.");
+					console.error("INTERNET EXPLORER IS EVIL");
+					document.write("Internet Explorer is not supported");
+					window.location = "https://www.microsoft.com/edge";
+				}
+			} catch(e){
+				console.error(e);
+			}
+		</script>
+		<style>
+			/* --- START OF INLINE STYLES --- */
+			:root {
+				--primary-bg: #1a1a1d;
+				--secondary-bg: #252529;
+				--tertiary-bg: #2c2c31;
+				--primary-text: #f0f0f0;
+				--secondary-text: #a0a0a0;
+				--accent-blue: #4a90e2;
+				--accent-blue-hover: #357abd;
+				--accent-green: #5cb85c;
+				--accent-green-hover: #4cae4c;
+				--accent-orange: #f0ad4e;
+				--accent-orange-hover: #eea236;
+				--accent-red: #d9534f;
+				--accent-red-hover: #c9302c;
+			}
+
+			/* Basic Reset & Body */
+			* {
+				box-sizing: border-box;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+
+			html {
+				background-color: var(--primary-bg);
+				transition: opacity .1s linear;
+			}
+
+			body {
+				background-color: var(--primary-bg);
+				color: var(--primary-text);
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+				margin: 0;
+				display: flex;
+				flex-direction: column;
+				min-height: 100vh;
+			}
+
+			/* Hide original complex UI elements */
+			#mainmenu, #info, #credits, #miniTaskBar, #dropButton,
+			#header #head1a, #header #head5, #header #head3, #header #head3a, #header #head4, #header #head2, #header #head6, #header #head7, #header #head8 {
+				display: none !important;
+			}
+
+			/* --- NEW SIMPLE UI --- */
+			#simple-ui-container {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				flex-grow: 1;
+				padding: 2rem 1rem;
+				text-align: center;
+			}
+
+			#simple-ui-container h1 {
+				font-size: 2.5rem;
+				font-weight: 700;
+				margin: 0 0 0.5rem 0;
+				color: var(--accent-blue);
+			}
+
+			#simple-ui-container p {
+				font-size: 1.1rem;
+				color: var(--secondary-text);
+				margin: 0 0 3rem 0;
+				max-width: 400px;
+			}
+			
+			.actions-wrapper {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+				width: 100%;
+				max-width: 420px;
+			}
+
+			.action-box {
+				background: var(--secondary-bg);
+				padding: 1.5rem;
+				border-radius: 12px;
+				border: 1px solid #333;
+			}
+
+			.action-box h2 {
+				margin: 0 0 1rem 0;
+				font-size: 1.2rem;
+				font-weight: 600;
+				color: var(--primary-text);
+			}
+
+			.input-group {
+				display: flex;
+			}
+
+			#joinroomID {
+				font-size: 1rem;
+				padding: 0.75rem;
+				border: 1px solid #444;
+				background-color: var(--tertiary-bg);
+				color: white;
+				border-radius: 8px 0 0 8px;
+				flex-grow: 1;
+			}
+			#joinroomID::placeholder { color: #777; }
+
+			#jumptoroomButton {
+				font-size: 1rem;
+				padding: 0.75rem 1.5rem;
+				border: 1px solid var(--accent-blue);
+				background-color: var(--accent-blue);
+				color: white;
+				cursor: pointer;
+				border-radius: 0 8px 8px 0;
+				font-weight: bold;
+				transition: background-color 0.2s;
+				white-space: nowrap;
+			}
+			#jumptoroomButton:hover { background-color: var(--accent-blue-hover); }
+
+			.action-button {
+				font-size: 1.1rem;
+				padding: 0.8rem;
+				border: none;
+				border-radius: 8px;
+				cursor: pointer;
+				font-weight: 600;
+				transition: background-color 0.2s, transform 0.2s;
+				width: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 0.75rem;
+			}
+			.action-button.camera { background-color: var(--accent-green); color: white; }
+			.action-button.camera:hover { background-color: var(--accent-green-hover); }
+			.action-button.screen { background-color: var(--accent-orange); color: white; }
+			.action-button.screen:hover { background-color: var(--accent-orange-hover); }
+			.action-button i { font-size: 1.3rem; }
+			
+			/* Modal for Camera Setup */
+			#camera-setup-modal {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0,0,0,0.7);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 1000;
+				padding: 1rem;
+			}
+
+			#camera-setup-content {
+				background: var(--tertiary-bg);
+				padding: 2rem;
+				border-radius: 16px;
+				width: 100%;
+				max-width: 600px;
+				position: relative;
+				border: 1px solid #444;
+			}
+
+			#camera-setup-content .close-modal {
+				position: absolute;
+				top: 1rem;
+				right: 1.5rem;
+				font-size: 2rem;
+				color: #aaa;
+				cursor: pointer;
+				line-height: 1;
+				font-weight: 200;
+			}
+
+			#camera-setup-content h2 { margin-top: 0; color: var(--primary-text); }
+			#previewWebcam {
+				width: 100%;
+				max-height: 300px;
+				background-color: #000;
+				border-radius: 8px;
+				margin-bottom: 1rem;
+				border: 1px solid #444;
+			}
+
+			#gowebcam {
+				width: 100%;
+				padding: 1rem;
+				font-size: 1.1rem;
+				background-color: var(--accent-blue);
+				color: white;
+				border: none;
+				border-radius: 8px;
+				cursor: pointer;
+			}
+			#gowebcam:disabled { background-color: #555; cursor: not-allowed; }
+
+			/* Hide advanced camera options */
+			#videoMenu, #audioMenu, #effectsDiv, #addPasswordBasic, #rememberStreamID, #SafariWarning, #oldiOSWarning, #consentWarning, #guestTips {
+				display: none !important;
+			}
+			
+			/* IN-CALL CONTROLS STYLING */
+			#controlButtons {
+				background-color: rgba(26, 26, 29, 0.9);
+				border-top: 1px solid #333;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				position: fixed;
+				z-index: 50;
+				padding: 0.5rem 0;
+				backdrop-filter: blur(5px);
+			}
+
+			#controlButtons .controlPositioning {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			
+			#subControlButtons { display: flex; gap: 1rem; }
+			#subControlButtons > div { display: none; } /* Hide all buttons */
+
+			/* Show only essential buttons and style them */
+			#mutebutton, #mutevideobutton, #screensharebutton, #hangupbutton {
+				display: flex !important;
+				position: relative !important;
+				background-color: #3a3a3f;
+				border-radius: 50%;
+				width: 50px;
+				height: 50px;
+				justify-content: center;
+				align-items: center;
+				transition: background-color 0.2s, transform 0.2s;
+			}
+			#subControlButtons > div:hover { transform: translateY(-2px); }
+			#hangupbutton { background-color: var(--accent-red); }
+			#hangupbutton:hover { background-color: var(--accent-red-hover); }
+			#subControlButtons .toggleSize { font-size: 1.5rem; }
+
+			@media (max-width: 480px) {
+				#simple-ui-container h1 { font-size: 2rem; }
+				.action-box { padding: 1rem; }
+				.input-group { flex-direction: column; gap: 0.5rem; }
+				#joinroomID, #jumptoroomButton { border-radius: 8px; }
+			}
+			/* --- END OF INLINE STYLES --- */
+		</style>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+		<title>VDO.Ninja - Simple</title>
+		
+		<link rel="stylesheet" href="./main.css?ver=406" /> <!-- Keep link for icons, but styles will be overridden -->
+		<script type="text/javascript" crossorigin="anonymous" src="./thirdparty/adapter.js"></script>
+		
+		<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon" />
+		<link id="favicon1" rel="icon" type="image/png" sizes="32x32" href="./media/favicon-32x32.png" />
+		<link id="favicon2" rel="icon" type="image/png" sizes="16x16" href="./media/favicon-16x16.png" />
+
+	</head>
+	<body id="main" class="main hidden" onload="main()">
+
+		<!-- NEW SIMPLIFIED UI -->
+		<div id="simple-ui-container">
+			<h1>VDO.Ninja</h1>
+			<p>Simple, secure, real-time video collaboration.</p>
+			<div class="actions-wrapper">
+				<div class="action-box">
+					<h2>Join a Room</h2>
+					<div class="input-group">
+						<input type="text" autocorrect="off" autocapitalize="none" id="joinroomID" name="joinroomID" tabindex="1" placeholder="Enter Room Name" onkeyup="jumptoroom(event)"/>
+						<button onclick="jumptoroom();" id='jumptoroomButton' role="button" tabindex="1">Join</button>
+					</div>
+				</div>
+				<div class="action-box">
+					<h2>Share Your Device</h2>
+					<button class="action-button camera" onclick="showCameraModal()">
+						<i class="las la-video"></i> Share Camera & Mic
+					</button>
+				</div>
+				<div class="action-box">
+					<h2>Share Your Screen</h2>
+					<button class="action-button screen" onclick="publishScreen()">
+						<i class="las la-desktop"></i> Share Screen
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- MODAL FOR CAMERA SETUP -->
+		<div id="camera-setup-modal" class="hidden">
+			<div id="camera-setup-content">
+				<span class="close-modal" onclick="hideCameraModal()">×</span>
+				<!-- This is where the original camera setup content will be moved -->
+			</div>
+		</div>
+		<script>
+			function showCameraModal() {
+				// Move the original content into the modal before showing it
+				const container3 = document.getElementById('container-3');
+				const modalContent = document.getElementById('camera-setup-content');
+				if (container3) {
+					// Prepend to keep the close button functional
+					modalContent.prepend(container3);
+					container3.style.display = 'block';
+					container3.classList.remove('hidden', 'card', 'pointer', 'columnfade', 'column'); // remove classes that might hide it
+				}
+				document.getElementById('camera-setup-modal').classList.remove('hidden');
+				// Trigger the original function to start the camera preview
+				previewWebcam();
+			}
+
+			function hideCameraModal() {
+				document.getElementById('camera-setup-modal').classList.add('hidden');
+				// Optional: stop camera streams if user closes modal
+				try {
+					hangup();
+				} catch(e) { console.log('No active call to hang up.'); }
+			}
+		</script>
+		<!-- END OF NEW UI -->
+
+
+		<!-- ORIGINAL HIDDEN ELEMENTS REQUIRED BY JS -->
+		<div id="original-elements" style="display: none;">
+			<div id="container-3" class="hidden" style="overflow-y: auto;">
+				<h2 id="add_camera">
+					<span>Configure Your Camera</span>
+				</h2>
+				<div class="container-inner" id="add_camera_inner">
+					<p>
+						<video id="previewWebcam" class="previewWebcam task" aria-hidden="true" title="Right-click this video for additional options" data-menu="context-menu-video" oncanplay="updateStats();" controlsList="nodownload" muted autoplay playsinline ></video>
+					</p>
+					<div id="infof"></div>
+					<button onclick="this.disabled=true;setTimeout(function(){requestBasicPermissions();},20);" id="getPermissions" style="display:none;" data-ready="false" >
+						<span>Allow Access to Camera/Microphone</span>
+					</button>
+					<span style="display:block;">
+						<button onclick="publishWebcam(this); hideCameraModal();" title="Start streaming" aria-label="Start streaming" role="button" tabindex="1" id="gowebcam" class="gowebcam" disabled data-audioready="false" data-ready="false" >
+							<span>Waiting for Camera to Load</span>
+						</button>
+					</span>
+					<div id="consentWarning" class="startupWarning hidden"></div>
+					<div id="guestTips" style="display:none" aria-hidden="true"></div>
+					<div id="videoMenu" class="videoMenu" aria-hidden="true">
+						<div class="title">
+                            <i class="las la-video"></i><span> Video Source </span>
+                        </div>
+						<span><select id="videoSourceSelect" tabindex="1"></select></span>
+					</div>
+					<div id="audioMenu" class="form-group multiselect">
+						<a id="multiselect-trigger" class="form-control multiselect-trigger" data-state="1">
+							<div class="title">
+								<i class="las la-microphone-alt"></i><span> Audio Source(s) </span>
+							</div>
+						</a>
+						<ul id="audioSource" class="multiselect-contents">
+							<li>
+								<input type="checkbox" id="multiselect1" name="multiselect1" style="display: none;" checked value="ZZZ" />
+								<label for="multiselect1"><span> No Audio</span></label>
+							</li>
+						</ul>
+					</div>
+					<div id="effectsDiv"></div><div id="addPasswordBasic"></div><div id="rememberStreamID"></div>
+					<div id="SafariWarning" class="startupWarning hidden"></div>
+					<div id="oldiOSWarning" class="startupWarning hidden"></div>
+				</div>
+			</div>
+			<div id="container-2" class="screenshareIcon" style="display:none!important;">
+				<h2 id="add_screen"><span>Remote Screenshare into OBS</span></h2>
+				<div class="container-inner">
+					<button class='gobutton mainScreenShareButton' onclick="publishScreen()"></button>
+				</div>
+			</div>
+		</div>
+
+		<span id="electronDragZone" style="display:none;"></span>
+		<div id="header" style="display:none;"></div> <!-- Keep for JS compatibility, but hide -->
+		
+		<div id="obsState" class="hidden" >ACTIVE</div>
+		<div id="chatModule" class="hidden"></div>
+		<div id="activeShares"></div>
+		<div id="controlButtons" class="hidden">
+			<div class="controlPositioning">
+                <div id="subControlButtons">
+                    <div id="mutebutton" onmousedown="toggleMute(false, event);event.preventDefault(); event.stopPropagation();" title="Mute the Mic (CTRL/⌘ + M)" ontouchstart="toggleMute(false, event);event.preventDefault(); event.stopPropagation();" class="hidden float">
+                        <i id="mutetoggle" class="toggleSize las la-microphone"></i>
+                    </div>
+                    <div id="mutevideobutton" onmousedown="event.preventDefault(); event.stopPropagation();" title="Disable the Camera (CTRL/⌘ + B)" onclick="toggleVideoMute()" class="hidden float">
+                        <i id="mutevideotoggle" class="toggleSize las la-video"></i>
+                    </div>
+                    <div id="screensharebutton" onmousedown="event.preventDefault(); event.stopPropagation();"  title="Share a Screen with others" onclick="screenshareTypeDecider(1)" class="float hidden task">
+                        <i id="screensharetoggle" class="toggleSize las la-desktop"></i>
+                    </div>
+                    <div id="hangupbutton"  onmousedown="event.preventDefault(); event.stopPropagation();" title="Hangup the Call" onclick="hangup()" class="hidden float">
+                        <i class="toggleSize las la-phone rotate225"></i>
+                    </div>
+					<!-- Other buttons are kept in DOM for JS but hidden by CSS -->
+					<div id="unmuteSelf"></div><div id="mediafileshare"></div><div id="blindAllGuests"></div><div id="queuebutton"></div>
+					<div id="sharefilebutton"></div><div id="chatbutton"></div><div id="mutespeakerbutton"></div><div id="screenshare2button"></div>
+					<div id="screenshare3button"></div><div id="websitesharebutton"></div><div id="websitesharebutton2"></div><div id="fullscreenPage"></div>
+					<div id="PictureInPicturePage"></div><div id="flipcamerabutton"></div><div id="blackoutmode"></div><div id="obscontrolbutton"></div>
+					<div id="roomsettingsbutton"></div><div id="settingsbutton"></div><div id="raisehandbutton"></div><div id="pptbackbutton"></div>
+					<div id="pptnextbutton"></div><div id="recordLocalbutton"></div><div id="recordLocalScreenbutton"></div>
+                </div>
+            </div>
+		</div>
+		
+		<div id="directorlayout" class="hidden directorsgrid"></div>
+		
+		<div id="hiddenElements"></div>
+		<div id="overlayMsgs" onclick="this.innerHTML = '';" style="display:none"></div>
+		<div id="stickyMsgs" class="hidden"></div>
+		<div id="bigPlayButton" onclick="this.innerHTML = '';" style="display:none"></div>
+		<div id="popupSelector" style="display:none;"></div>
+		<div id="mainmenu" style="display:none!important;"></div> <!-- Explicitly hide the main menu -->
+		
+		<!-- All other hidden elements, popups, templates, etc. required by the original app -->
+		<div style="display:none;">
+			<div id="unexpectedPushLink"></div><div id="info"></div><form method="post" onsubmit="setFormSubmitting()"><input type="submit" /></form><div id="credits"></div>
+			<div id="controls_blank"></div><div id="controls_directors_blank"></div><nav id="context-menu"></nav><nav id="context-menu-screen-share"></nav>
+			<nav id="context-menu-clock"></nav><nav id="context-menu-video"></nav><div id="roomSettings"></div><div id="bufferSettings"></div>
+			<div id="publishSettings"></div><div id="remoteOBSControl"></div><div id="transferSettingsTemplate"></div><div id="connectUsers"></div>
+			<div id="callerMenu"></div><div id="progressContainer"></div><div id="signalMeterTemplate"></div><input type='range' id="volumeControlTemplate"/>
+			<div id="batteryMeterTemplate"></div><div id="slotPicker"></div><div id="voiceMeterTemplate"></div><div id="voiceMeterTemplate2"></div>
+			<div id="muteStateTemplate"></div><div id="videoMuteStateTemplate"></div><div id="raisedHandTemplate"></div><div id="selectImage_contents"></div>
+			<div id="selectImageOverlay_contents"></div><div id="gridlayout"></div><audio id="testtone"></audio><div class="gone"><img src="./media/favicon-32x32.png" id="dragImage" /></div>
+			<div id="request_info_prompt"></div><div id="screenPopup"></div><div id="messagePopup"></div><div id="languages"></div><div id="calendar"></div>
+			<span class="hidden" id="hangupTemplate"></span><div id="meshcastMenu"></div>
+		</div>
+
+		<script>
+			if (window.location.hostname.indexOf("www.obs.ninja") == 0) {
+				window.location = window.location.href.replace("www.obs.ninja","obs.ninja");
+			} else if (window.location.hostname.indexOf("www.vdo.ninja") == 0) {
+				window.location = window.location.href.replace("www.vdo.ninja","vdo.ninja");
+			} else if (("isSecureContext" in window) && (window.isSecureContext===false)){
+				console.error("Warning: This site should be run in a secure context (https).");
+			}
+			console.log("->> Note: Do not paste code into this console unless from a trusted source <<--");
+			var session = WebRTC.Media;
+			session.version = "27.8";
+			session.streamID = session.generateStreamID();
+			session.defaultPassword = "someEncryptionKey123";
+			session.stunServers = [{ urls: ["stun:stun.l.google.com:19302", "stun:stun.cloudflare.com:3478"]}];
+		</script>
+		<script type="text/javascript" crossorigin="anonymous"  src="./thirdparty/CodecsHandler.js?ver=28"></script>
+		<script type="text/javascript" crossorigin="anonymous" src="./thirdparty/aes.js"></script>
+		<script type="text/javascript" crossorigin="anonymous" src="./webrtc.js?ver=858"></script>
+		<script type="text/javascript" crossorigin="anonymous" id="lib-js" src="./lib.js?ver=1324"></script>
+		<script type="text/javascript" crossorigin="anonymous" id="main-js" src="./main.js?ver=981"></script>
+	</body>
+</html>
